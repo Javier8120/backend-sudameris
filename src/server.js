@@ -1,39 +1,63 @@
-/// Servidor...
-const express = require('express') // Llamamos express
-const app = express() // A travez de la constante app accedemos a todo lo que tenga expres
-const morgan = require('morgan') //llamamos a morgan
-const cors = require('cors') //llamamos a cors
-//const bodyparser = require('body-parser') // llamamos bodypaster. 
-//Rutas Import
-const { UserRoutes } = require("./routes/UserRoutes")
+/* const http = require("./http")
+const db = require("./database")
+
+http.init();
+db.init(); */
+
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const express   = require("express");
+const cors = require("cors");
+const morgan = require('morgan'); //llamamos a morgan
+const { userRoutes } = require("./routes/userRoutes")
 const { RegisterRoutes } = require("./routes/RegisterRoutes")
-/* const { AdminRoutes } = require("./routes/AdminRoutes") */
+//cONFIGURACION VARIABLES DE ENTORNO
+dotenv.config();
+const config = {
+  http: {
+    host: process.env.HOST || "0.0.0.0",
+    port: process.env.PORT || process.env.HTTP_PORT
+  },
+  dbString: process.env.DB_CONNECTION_STRING
+};
+const { host, port } = config.http;
+const dbString = config.dbString;
+  
+const iniciarDb = async () => {
+    const options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    };
+    try {
+      await mongoose.connect(dbString, options); //'mongodb://localhost:27017/banco-sudameris'
+      console.log("Connected to the databse sucessfully");
+    } catch (error) {
+      console.log(`Error message: ${error.message}`)
+  
+    }
+  }
 
-// BD.
-require('./database')
-//Como se llama la peli: Las llamadas de los paquetes que necesitamos. 
-app.set('Port', 4000) // Nuestro server correrar en el puerto 4000
-app.use(cors()) //Middleware cors
-app.use(express.json()); //Middleware para convertir a JSON
-app.use(morgan('dev')) //Le decimos a la app que use morgan Y ESTO NOS LISTARA LAS PETICIONES QUE HAGAN A NUESTRO SERVIDOR..
-//app.use(bodyparser.urlencoded({extended:true})) 
+const iniciarServer = () => {
+    app.listen(port, host, () => {
+      console.log(`Server running on http://${host}:${port}`);
+    })
+  }
 
+
+
+
+const app = express();
+app.use(cors()); //Peticiones de otros dominios
+app.use(express.json()) // lee archios json
+app.use(morgan('dev')) // Ver peticiones que le hacen a nuestra api en consola.
+app.get("/prueba", (req, res)=>{
+    res.json(req.body)
+});
 app.use("/registros", RegisterRoutes);
-app.use("/user", UserRoutes);
-//app.use(bodyparser.json())
-//Rutas
-//app.use('/api/',require('./routes/UserRoutes'))
+app.use("/user", userRoutes);
 
+//Iniciando bd y conexion con servidor
+iniciarDb();
+iniciarServer();
 
-
-
-
-//start server
-
-app.listen(app.get('Port'), () =>{
-    console.log ('Escuchando por el puerto', app.get('Port'))
-})
-
-//Configurando nodemon. 
-//En package Json esta la linea de configuracion
-//para nodemon. en Scripts... 
+///Asignado Rutas 

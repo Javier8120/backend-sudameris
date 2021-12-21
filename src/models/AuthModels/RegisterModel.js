@@ -17,28 +17,28 @@ const RegisterSchema = new Schema({
 
 },
   numero_identificacion:{
-    type: "number",
+    type: "string",
     required: true,
     unique: true
 },
   fecha_nacimiento:{
-    type: "string",
+    type: "date",
     required: true
 },
   fecha_expedicion:{
-    type: "string",
+    type: "date",
     required: true
 },
   valor_ingresos:{
-    type: "number",
+    type: "string",
     required : true
 },
   valor_egresos:{
-    type: "number",
+    type: "string",
     required : true
 },
   valor_matricula:{
-    type: "number",
+    type: "string",
     required : true
 },
   email:{
@@ -49,8 +49,12 @@ const RegisterSchema = new Schema({
 password:{
   type: "string",
   required : true
+},
+rol: {
+  type: "string",
+  required: true
 }
 
 });
-const RegisterModel = mongoose.model("Register",RegisterSchema); // Register es la coleccio nde la base de datos a la que me quiero conectar. 
+const RegisterModel = mongoose.model("registers",RegisterSchema); // Register es la coleccio nde la base de datos a la que me quiero conectar. 
 exports.RegisterModel = RegisterModel;

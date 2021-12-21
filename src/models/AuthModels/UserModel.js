@@ -2,16 +2,19 @@
 // que yo guarde en la coleccion User.) 
 
 const {model, Schema} = require("mongoose")
-const UserSchema = new Schema({
+const { genSalt, hash } = require("bcrypt");
+
+
+const userSchema = new Schema({
 
     
     nombres:{ 
         type: "string",
-        
+        required: true
     },
     apellidos: {
         type: "string",
-       
+        required: true
     },
     email: {
         type: "string",
@@ -31,5 +34,12 @@ const UserSchema = new Schema({
 
 });
 
-const UserModel = model("user", UserSchema); // User es la coleccio nde la base de datos a la que me quiero conectar. 
-exports.UserModel = UserModel;
+userSchema.pre("save", async function (next) {
+    const salt = await genSalt(+process.env.BCRYPT_ROUNDS);
+    this.password = await hash(this.password, salt);
+    next();
+})
+
+const userModel = model("users", userSchema);
+
+exports.userModel = userModel;
